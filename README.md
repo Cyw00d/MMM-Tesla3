@@ -1,104 +1,56 @@
-# Module: MMM-Tesla2 (early prototype)
-The `MMM-Tesla2` module is a <a href="https://github.com/MichMich/MagicMirror">MagicMirror</a> addon. This module displays some of your <a href="https://www.tesla.com">Tesla's</a> data on your Mirror. It is forked from <a href="https://github.com/janhenrik/MMM-Tesla/">MMM-Tesla</a> which was invaluable for the work on this module.
+# MMM-Tesla3
+I needed a better Tesla module for the mirror, I know there is a version 1 (MMM-Tesla Not working and last updated 3 yrs ago) and version 2 (MMM-Tesla2 No car-wake and you need to manually find the VIN for config).
 
-This is just an early prototype, supporting one vehicle only - displaying the battery state graphically, as well as the range in kms. It uses
-the unofficial Tesla JSON API from https://timdorr.docs.apiary.io
+## Installation
+```bash
+cd ~/MagicMirror/modules
+```
 
-## Installing the module
-run `git clone https://github.com/martinburheimtingstad/MMM-Tesla2` from inside your `MagicMirror/modules` folder. Then run `npm install` to install dependencies.
+```bash
+git clone https://github.com/Cyw00d/MMM-Tesla3.git
+```
 
+```bash
+cd MMM-Tesla3 && npm install
+```
 
-## Using the module
-To use this module, add it to the modules array in the `config/config.js` file:
-````javascript
-modules: [
-		{
-			module: 'MMM-Tesla',
-			position: 'bottom_right',	// This can be any of the regions.
-									// Best results in one of the side regions like: top_left
-			config: {
-				// See 'Configuration options' for more information.
-				email: 'nn@example.com', 
-				password: "XXXXXX",
-				client_id: 'XXXXX',
-				client_secret: 'XXXXXX',
-				vehicle_id: 'XXXXX',
-				google_api_key: 'XXXXX',
-				refreshInterval: 1000 * 60 * 10 // 60 minutes
-			}
-		}
-]
-````
+## Configuration
+Copy the example config to your MagicMirror config file:
 
-## Configuration options
-The following properties can be configured:
+```javascript
 
+{
+  module: 'MMM-Tesla3',
+  position: 'bottom_left',	// This can be any of the regions.
+  config: {
+    email: 'elonmusk@tesla.com',
+    password: 'B3tterTh4nG4zz',
+    region: 'EU',
+    client_id: '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
+    client_secret:  'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
+    refreshIntervalWhileCharging:  1000 * 60 * 2, // 1000 = 1s || * 60 = 1 minute * 10 = 10 minutes
+    wakeOnModuleLoad: true,
+    wakeOnRefresh: false,
+  }
+},
+```
+| key  | Required | Description | Default |
+| - | - | - | - |
+| email | yes | Your Tesla login email |  | 
+| password | yes | Your Tesla login password |  |
+| client_id | yes | You can get it from the config example above, Tesla needs this to authenticate  | |
+| client_secret| yes | You can get it from the config example above, Tesla needs this to authenticate | |
+| refreshInterval | no | When should the data be refreshed when not charging? | `1000 * 60 * 60` (60 minutes) |
+| refreshIntervalWhileCharging | no | When should the data be refreshed when the car is charging? | `1000 * 60 * 10` (10 minutes) |
+| wakeOnModuleLoad | no | When true, on initial module load the car will be woken up when in sleep mode to get the latest data | `false` |
+| wakeOnRefresh | no | When set to true, the car will be woken up every time the module refreshes his data (see refreshInterval) | `false` |
+| showLastUpdated | no | Show 'Updated 4 minutes ago' at the bottom | `true` |
 
-<table width="100%">
-	<!-- why, markdown... -->
-	<thead>
-		<tr>
-			<th width="25%">Option</th>
-			<th width="25%">Description</th>
-			<th width="50%">Example value</th>
-		</tr>
-	<thead>
-	<tbody>
-		<tr>
-			<td><code>email</code></td>
-			<td>Your tesla.com email adress, matching the owner's login information for https://my.teslamotors.com/user/login.</td>
-			<td> <br>
-				<br><b>Example:</b> <code>elon@tesla.com</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>password</code></td>
-			<td>Your tesla.com password, matching the owner's login information for https://my.teslamotors.com/user/login.</td>
-			<td><br>
-				<br><b>Example:</b> <code>password</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>client_id</code></td>
-			<td>The current client_id is available <a href="http://pastebin.com/YiLPDggh">here</a>.
-			<td><br>
-				<br><b>Example:</b> <code>abc</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>client_secret</code></td>
-			<td>The current client_secret is available <a href="http://pastebin.com/YiLPDggh">here</a>.
-			<td><br>
-				<br><b>Example:</b> <code>abc</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>vehicle_id</code></td>
-			<td>The vehicle_id can be found calling https://owner-api.teslamotors.com/api/1/vehicles with e.g. curl with an OAuth-token attached. Documentation <a href="https://timdorr.docs.apiary.io/#reference/vehicles/vehicle-collection/list-all-vehicles">here</a>. Or simply install the excellent <a href="https://github.com/hjespers/teslams">teslams command line client</a> and run <b>teslacmd vehicles</b>... and get the vehicle_id from there.
-			<td><br>
-				<br><b>Example:</b> <code>abc</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>google_api_key</code></td>
-			<td>You will need a Google API key, can be generated <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">here</a>.
-			<td><br>
-				<br><b>Example:</b> <code>abc</code>
-				<br> This value is <b>REQUIRED</b>
-			</td>
-		</tr>
-		<tr>
-			<td><code>refreshInterval</code></td>
-			<td>How often this refreshes<br>
-				<br><b>Example:</b> <code>60000</code>
-				<br> I'm not stressing the service, so once an hour is default.
-				<br><b>Default value:</b> <code>600000</code>
-			</td>
-		</tr>
-	</tbody>
-</table>
+## Preview
+![Tesla example](/preview.jpg)
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
